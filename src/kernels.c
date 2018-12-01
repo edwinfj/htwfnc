@@ -1,16 +1,17 @@
+#include "kernels.h"
 #include <math.h>
 
 /**
  * C := AB
  */
-void MMM(float A[][], float B[][], float C[][], int N)
+void naive_MMM(float **A, float **B, float **C, int AR, int AC, int BC)
 {
 	int i, j, k;
 
-	for (i = 0; i < N; ++i) {
-		for (j = 0; j < N; ++j) {
-			for (k = 0; k < N; ++k) {
-				C[i][j] = A[i][k] * B[k][j];
+	for (i = 0; i < AR; ++i) {
+		for (j = 0; j < BC; ++j) {
+			for (k = 0; k < AC; ++k) {
+				C[i][j] += A[i][k] * B[k][j];
 			}
 		}
 	}
@@ -18,9 +19,9 @@ void MMM(float A[][], float B[][], float C[][], int N)
 
 
 /**
- * DFT
+ * radix-2 FFT applying Danielson-Lanczos Lemma
  */
-#define SWAP(a, b) tempr = a; a = b; b = tempr;
+#define SWAP(a, b) (tempr) = (a); (a) = (b); (b) = (tempr);
 void four1(float *data, int *nn, int *isign)
 {
 	int n, mmax, m, j, i;
@@ -70,7 +71,7 @@ void four1(float *data, int *nn, int *isign)
 				j += mmax * 2;
 			}
 			tempr -= tempi;
-			tempi = (double) wr * datali + (double) wi * datalr;
+			tempi = (double) wr * data1i + (double) wi * data1r;
 			data[i] = (datar = data[i]) + tempr;
 			data[i+1] = (datai = data[i+1]) + tempi;
 			data[j] = datar - tempr;
