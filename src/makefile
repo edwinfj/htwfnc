@@ -1,45 +1,52 @@
-OBJDIR := ../bin
+# default
+REL:=1
+AVX2:=1
+# end default
 
-ifneq ($(REL),)
-	BUILD_TYPE := Release
+OBJDIR:=../bin
+
+ifeq ($(REL),1)
+	BUILD_TYPE:=Release
+	CPPFLAGS+=-DRELEASE
 else
-	BUILD_TYPE := Debug
+	BUILD_TYPE:=Debug
+	CPPFLAGS+=-DDEBUG
 endif
 
-OBJDIR := $(abspath $(addsuffix $(BUILD_TYPE)/,$(addsuffix _,$(OBJDIR))))
+OBJDIR:=$(abspath $(addsuffix $(BUILD_TYPE)/,$(addsuffix _,$(OBJDIR))))
 
-HEADERS := kernels.h test.h
-SRCS := kernels.c main.c test.c
-LIBS := m
-EXE := $(addprefix $(OBJDIR),main)
-OBJS := $(addprefix $(OBJDIR),$(SRCS:.c=.o))
-TUS := $(addprefix $(OBJDIR),$(SRCS:.c=.i))
-ASMS := $(addprefix $(OBJDIR),$(SRCS:.c=.s))
+HEADERS:=kernels.h test.h
+SRCS:=kernels.c main.c test.c
+LIBS:=m
+EXE:=$(addprefix $(OBJDIR)/,main)
+OBJS:=$(addprefix $(OBJDIR)/,$(SRCS:.c=.o))
+TUS:=$(addprefix $(OBJDIR)/,$(SRCS:.c=.i))
+ASMS:=$(addprefix $(OBJDIR)/,$(SRCS:.c=.s))
 
-INCLUDE_PATH +=
-LIBRARY_PATH +=
-LD_LIBRARY_PATH +=
+INCLUDE_PATH+=
+LIBRARY_PATH+=
+LD_LIBRARY_PATH+=
 
-CPPFLAGS += -Wall
-CFLAGS += -g
-LDFLAGS += $(foreach lib,$(LIBS),-l$(lib))
+CPPFLAGS+=-Wall
+CFLAGS+=-g
+LDFLAGS+=$(foreach lib,$(LIBS),-l$(lib))
 
-TARGET_ARCH += 
+TARGET_ARCH+=
 
 ifeq ($(AVX2), 1)
-	CFLAGS += -mavx2
+	CFLAGS+=-mavx2
 else
-	CFLAGS += -mavx    # most processors nowadays has the avx extension
+	CFLAGS+=-mavx    # most processors nowadays has the avx extension
 endif
 
 ifeq ($(BUILD_TYPE),Release)
-	CFLAGS += -O3
+	CFLAGS+=-O3
 	ifeq ($(GPROF),1)
 		ifeq ($(CC),gcc)
-			CLFAGS += -pg
+			CLFAGS+=-pg
 		else
 			ifeq ($(CC), icc)
-				CFLAGS += -p
+				CFLAGS+=-p
 			endif
 		endif
 	endif
@@ -54,17 +61,17 @@ gen_asm: $(ASMS)
 $(EXE): $(OBJS)
 	$(LINK.c) -o $@ $^
 
-$(OBJDIR)%.o: %.c
+$(OBJDIR)/%.o: %.c
 	$(COMPILE.c) $< -o $@
 
-$(OBJDIR)%.i: %.c
+$(OBJDIR)/%.i: %.c
 ifeq ($(CC), icc)
 	$(CC) $(CPPFLAGS) -P -C $< -o $@
 else
 	$(CC) $(CPPFLAGS) -E -C $< -o $@
 endif
 
-$(OBJDIR)%.s: %.c
+$(OBJDIR)/%.s: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -S $< -o $@
 
 $(OBJS) $(ASMS) $(TUS): $(HEADERS) | $(OBJDIR)

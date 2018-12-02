@@ -4,14 +4,14 @@
 /**
  * C := AB
  */
-void naive_MMM(float **A, float **B, float **C, int AR, int AC, int BC)
+void naive_MMM(float **a, float **b, float **c, int ar, int ac, int bc)
 {
 	int i, j, k;
 
-	for (i = 0; i < AR; ++i) {
-		for (j = 0; j < BC; ++j) {
-			for (k = 0; k < AC; ++k) {
-				C[i][j] += A[i][k] * B[k][j];
+	for (i = 0; i < ar; ++i) {
+		for (j = 0; j < bc; ++j) {
+			for (k = 0; k < ac; ++k) {
+				c[i][j] += a[i][k] * b[k][j];
 			}
 		}
 	}

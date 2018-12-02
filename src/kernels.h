@@ -6,7 +6,7 @@
  * Naive implementation of matrix multiplication.
  * C = AB
  */
-void naive_MMM(float **A, float **B, float **C, int AR, int AC, int BC)
+void naive_MMM(float **a, float **b, float **c, int ar, int ac, int bc);
 
 
 /**
